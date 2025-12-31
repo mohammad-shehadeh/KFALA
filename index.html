@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معرض الصور من الجذر</title>
+    <title>معرض الصور - إطار مرن</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,7 +14,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             color: #333;
             line-height: 1.6;
             padding: 20px;
@@ -22,7 +22,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
@@ -32,17 +32,22 @@
             padding: 20px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
         
         h1 {
             color: #2c3e50;
             margin-bottom: 10px;
             font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
         
         .subtitle {
-            color: #7f8c8d;
+            color: #6c757d;
             font-size: 1rem;
             margin-bottom: 15px;
         }
@@ -104,8 +109,8 @@
         
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
             margin-bottom: 30px;
         }
         
@@ -116,23 +121,45 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
             border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
         }
         
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
         }
         
-        .card img {
+        /* إطار الصورة المرن - يأخذ حجم الصورة الأصلي */
+        .image-container {
             width: 100%;
-            height: 200px;
-            object-fit: cover;
-            display: block;
+            overflow: hidden;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
             border-bottom: 1px solid #eee;
+            min-height: 100px;
+            max-height: 600px; /* ارتفاع أقصى لتجنب الصور الطويلة جدًا */
+        }
+        
+        .image-container img {
+            display: block;
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            width: auto;
+            object-fit: contain;
+            border-radius: 0;
         }
         
         .card-content {
             padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
         
         .card-title {
@@ -144,11 +171,19 @@
         
         .file-info {
             font-size: 0.8rem;
-            color: #7f8c8d;
+            color: #6c757d;
             margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .image-size {
+            background: #e9ecef;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
         }
         
         .download-btn {
@@ -169,6 +204,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            margin-top: auto;
         }
         
         .download-btn:hover {
@@ -179,7 +215,7 @@
             text-align: center;
             padding: 20px;
             margin-top: 30px;
-            color: #7f8c8d;
+            color: #6c757d;
             font-size: 0.85rem;
             border-top: 1px solid #e0e0e0;
         }
@@ -205,17 +241,43 @@
         .image-counter {
             position: absolute;
             top: 10px;
-            left: 10px;
+            right: 10px;
             background: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 3px 8px;
             border-radius: 12px;
             font-size: 0.75rem;
             font-weight: bold;
+            z-index: 1;
         }
         
-        .image-container {
+        .image-wrapper {
             position: relative;
+            width: 100%;
+        }
+        
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .view-btn {
+            padding: 8px 15px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .view-btn.active {
+            background: #3498db;
+            color: white;
         }
         
         @media (max-width: 768px) {
@@ -226,6 +288,10 @@
             
             h1 {
                 font-size: 1.8rem;
+            }
+            
+            .image-container img {
+                max-height: 400px;
             }
         }
         
@@ -247,25 +313,66 @@
                 width: 100%;
                 justify-content: center;
             }
+            
+            .image-container img {
+                max-height: 350px;
+            }
+        }
+        
+        /* أنيميشن لتحميل الصور */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* نمط للصور العمودية */
+        .card.portrait .image-container {
+            max-height: 700px;
+        }
+        
+        .card.portrait .image-container img {
+            max-height: 650px;
+        }
+        
+        /* نمط للصور الأفقية */
+        .card.landscape .image-container {
+            max-height: 400px;
+        }
+        
+        .card.landscape .image-container img {
+            max-height: 350px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-camera"></i> معرض الصور من الجذر</h1>
-            <p class="subtitle">جميع الصور مأخوذة تلقائيًا من نفس مستوى ملف index.html</p>
+            <h1><i class="fas fa-images"></i> معرض الصور - إطار مرن</h1>
+            <p class="subtitle">كل صورة تعرض بحجمها الأصلي مع إطار مرن يتكيف مع أبعادها</p>
             <div class="info-box">
-                <i class="fas fa-folder-open"></i>
-                <span>المجلد الحالي: الجذر (نفس مكان index.html)</span>
+                <i class="fas fa-expand-alt"></i>
+                <span>إطار كل صورة يتكيف تلقائيًا مع حجمها الأصلي</span>
+            </div>
+            
+            <div class="view-toggle" id="viewToggle">
+                <button class="view-btn active" data-view="flexible">
+                    <i class="fas fa-expand-alt"></i> إطار مرن
+                </button>
+                <button class="view-btn" data-view="fixed">
+                    <i class="fas fa-crop-alt"></i> إطار ثابت
+                </button>
             </div>
             
             <div class="controls">
                 <button class="control-btn" onclick="scanForImages()">
-                    <i class="fas fa-search"></i> مسح المجلد للصور
+                    <i class="fas fa-search"></i> بحث عن الصور
                 </button>
                 <button class="control-btn secondary" onclick="showHowToAddImages()">
-                    <i class="fas fa-question-circle"></i> كيفية إضافة صور
+                    <i class="fas fa-question-circle"></i> المساعدة
                 </button>
             </div>
         </header>
@@ -282,7 +389,7 @@
         </div>
         
         <div class="footer">
-            <p>معرض الصور التلقائي &copy; <span id="currentYear"></span> | جميع الصور موجودة في نفس مستوى الملف</p>
+            <p>معرض الصور التلقائي &copy; <span id="currentYear"></span> | كل صورة بحجمها الطبيعي</p>
         </div>
     </div>
 
@@ -293,6 +400,10 @@
         // العناصر الرئيسية
         const galleryElement = document.getElementById('imageGallery');
         const statsContainer = document.getElementById('statsContainer');
+        const viewToggle = document.getElementById('viewToggle');
+        
+        // حالة العرض الحالية
+        let currentView = 'flexible';
         
         // امتدادات الصور المدعومة
         const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
@@ -302,8 +413,44 @@
             'IMG_4419.jpeg', 'IMG_4420.jpg', 'IMG_4421.png',
             'photo1.jpg', 'photo2.jpg', 'image1.png', 'image2.jpeg',
             'nature.jpg', 'sunset.png', 'mountain.jpeg', 'beach.jpg',
-            'profile.png', 'logo.png', 'background.jpg'
+            'profile.png', 'logo.png', 'background.jpg', 'example.png'
         ];
+        
+        // تهيئة أزرار تغيير العرض
+        function initViewToggle() {
+            const viewButtons = viewToggle.querySelectorAll('.view-btn');
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // إزالة النشاط من جميع الأزرار
+                    viewButtons.forEach(b => b.classList.remove('active'));
+                    // إضافة النشاط للزر المضغوط
+                    this.classList.add('active');
+                    // تحديث حالة العرض
+                    currentView = this.getAttribute('data-view');
+                    // إعادة عرض الصور بالنمط الجديد
+                    reapplyViewMode();
+                });
+            });
+        }
+        
+        // إعادة تطبيق نمط العرض
+        function reapplyViewMode() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                if (currentView === 'flexible') {
+                    card.classList.remove('fixed-size');
+                    // إزالة أي أنماط ثابتة مضافَة
+                    const imgContainer = card.querySelector('.image-container');
+                    const img = card.querySelector('img');
+                    if (imgContainer && img) {
+                        imgContainer.style.height = 'auto';
+                        img.style.maxHeight = '500px';
+                    }
+                } else {
+                    card.classList.add('fixed-size');
+                }
+            });
+        }
         
         // دالة للمسح التلقائي للصور
         async function scanForImages() {
@@ -376,7 +523,7 @@
             return imageFiles;
         }
         
-        // دلة للمسح المباشر للصور (محاولة تحميل كل صورة محتملة)
+        // دالة للمسح المباشر للصور (محاولة تحميل كل صورة محتملة)
         async function scanImagesDirectly() {
             const foundImages = [];
             
@@ -399,7 +546,9 @@
                     `IMG_${4400 + i}.png`,
                     `image${i}.jpg`,
                     `photo${i}.jpeg`,
-                    `pic${i}.png`
+                    `pic${i}.png`,
+                    `صوره${i}.jpg`,
+                    `صورة${i}.jpeg`
                 ];
                 
                 for (const name of possibleNames) {
@@ -442,8 +591,33 @@
             return title;
         }
         
+        // دالة للحصول على أبعاد الصورة
+        function getImageDimensions(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function() {
+                    resolve({
+                        width: this.width,
+                        height: this.height,
+                        aspectRatio: this.width / this.height
+                    });
+                };
+                img.onerror = function() {
+                    resolve({ width: 0, height: 0, aspectRatio: 1 });
+                };
+                img.src = url;
+            });
+        }
+        
+        // دالة لتحديد نمط الصورة (عمودي/أفقي)
+        function getImageOrientation(aspectRatio) {
+            if (aspectRatio > 1.2) return 'landscape'; // أفقي
+            if (aspectRatio < 0.8) return 'portrait'; // عمودي
+            return 'square'; // مربع
+        }
+        
         // دالة لعرض الصور
-        function displayImages(imageFiles) {
+        async function displayImages(imageFiles) {
             // تحديث الإحصائيات
             if (imageFiles.length === 0) {
                 statsContainer.innerHTML = `
@@ -459,7 +633,7 @@
                         <ol style="text-align: right; margin: 15px 0; padding-right: 20px;">
                             <li>انقل صورك إلى نفس المجلد الذي يحتوي على index.html</li>
                             <li>تأكد من أن أسماء الصور تحتوي على امتدادات مثل .jpg أو .png</li>
-                            <li>اضغط على زر "مسح المجلد للصور"</li>
+                            <li>اضغط على زر "بحث عن الصور"</li>
                         </ol>
                         <button class="control-btn" onclick="scanForImages()" style="margin-top: 10px;">
                             <i class="fas fa-redo"></i> حاول مرة أخرى
@@ -476,19 +650,32 @@
             // إنشاء معرض الصور
             let galleryHTML = '';
             
-            imageFiles.forEach((image, index) => {
+            for (let i = 0; i < imageFiles.length; i++) {
+                const image = imageFiles[i];
+                
+                // الحصول على أبعاد الصورة
+                const dimensions = await getImageDimensions(image.name);
+                const orientation = getImageOrientation(dimensions.aspectRatio);
+                const sizeText = dimensions.width > 0 ? `${dimensions.width} × ${dimensions.height}` : 'غير معروف';
+                
                 galleryHTML += `
-                    <div class="card">
-                        <div class="image-container">
-                            <div class="image-counter">${index + 1}</div>
-                            <img src="${image.name}" alt="${image.title}" 
-                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/e0e0e0/757575?text=خطأ+في+الصورة'">
+                    <div class="card ${orientation}">
+                        <div class="image-wrapper">
+                            <div class="image-counter">${i + 1}</div>
+                            <div class="image-container">
+                                <img src="${image.name}" alt="${image.title}" 
+                                     loading="lazy"
+                                     onload="this.style.opacity='1'"
+                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/e0e0e0/757575?text=خطأ+في+الصورة'"
+                                     style="opacity:0; transition: opacity 0.3s ease;">
+                            </div>
                         </div>
                         <div class="card-content">
                             <h3 class="card-title">${image.title}</h3>
                             <div class="file-info">
                                 <span><i class="far fa-file"></i> ${image.name}</span>
-                                <span><i class="fas fa-expand-arrows-alt"></i> أصلي</span>
+                                <span class="image-size"><i class="fas fa-expand-alt"></i> ${sizeText}</span>
+                                <span><i class="fas fa-${orientation === 'portrait' ? 'arrows-alt-v' : orientation === 'landscape' ? 'arrows-alt-h' : 'square'}"></i> ${orientation === 'portrait' ? 'عمودي' : orientation === 'landscape' ? 'أفقي' : 'مربع'}</span>
                             </div>
                             <button class="download-btn" onclick="downloadImage('${image.name}', '${image.title}')">
                                 <i class="fas fa-download"></i> تحميل إلى الهاتف
@@ -496,9 +683,12 @@
                         </div>
                     </div>
                 `;
-            });
+            }
             
             galleryElement.innerHTML = galleryHTML;
+            
+            // تطبيق نمط العرض الحالي
+            reapplyViewMode();
         }
         
         // دالة لتحميل الصور
@@ -531,6 +721,9 @@
                 box-shadow: 0 5px 15px rgba(0,0,0,0.2);
                 z-index: 1000;
                 animation: slideIn 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
             `;
             
             messageDiv.innerHTML = `
@@ -545,18 +738,21 @@
             }, 3000);
             
             // إضافة أنيميشن
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
+            if (!document.querySelector('#messageAnimations')) {
+                const style = document.createElement('style');
+                style.id = 'messageAnimations';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
         }
         
         // دالة لعرض رسالة خطأ
@@ -590,12 +786,13 @@
                             </ul>
                         </li>
                         <li>الامتدادات المدعومة: .jpg, .jpeg, .png, .gif, .bmp, .webp, .svg</li>
-                        <li>بعد إضافة الصور، اضغط على زر "مسح المجلد للصور"</li>
+                        <li>بعد إضافة الصور، اضغط على زر "بحث عن الصور"</li>
                     </ol>
-                    <p style="background: #f8f9fa; padding: 10px; border-radius: 5px; border-right: 4px solid #3498db;">
-                        <i class="fas fa-lightbulb"></i> <strong>ملاحظة:</strong> إذا لم تظهر الصور تلقائيًا، 
-                        تأكد من أن الخادم يسمح بسرد الملفات (directory listing).
-                    </p>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; border-right: 4px solid #3498db; margin-top: 15px;">
+                        <h4><i class="fas fa-expand-alt"></i> خاصية الإطار المرن:</h4>
+                        <p>كل صورة تعرض <strong>بحجمها الأصلي</strong> مع إطار يتكيف تلقائيًا مع أبعادها.</p>
+                        <p>الصور العمودية تعرض بارتفاع أكبر، والأفقية بعرض أكبر.</p>
+                    </div>
                 </div>
             `;
             
@@ -623,7 +820,7 @@
                     ${instructions}
                     <button class="control-btn" onclick="this.parentElement.parentElement.remove(); scanForImages()" 
                             style="width: 100%; margin-top: 15px;">
-                        <i class="fas fa-search"></i> ابدأ المسح الآن
+                        <i class="fas fa-search"></i> ابدأ البحث الآن
                     </button>
                 </div>
             `;
@@ -631,8 +828,11 @@
             document.body.appendChild(modal);
         }
         
-        // بدء المسح تلقائيًا عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', scanForImages);
+        // بدء المسح تلقائيًا عند تحميل الصفحة وتهيئة أزرار العرض
+        document.addEventListener('DOMContentLoaded', function() {
+            initViewToggle();
+            scanForImages();
+        });
     </script>
 </body>
 </html>
