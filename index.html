@@ -44,6 +44,50 @@
         .subtitle {
             color: #7f8c8d;
             font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .info-box {
+            background: #e8f4fc;
+            border-right: 5px solid #3498db;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .refresh-btn, .upload-btn {
+            padding: 10px 20px;
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+        }
+        
+        .refresh-btn:hover {
+            background: linear-gradient(to right, #27ae60, #219653);
+        }
+        
+        .upload-btn:hover {
+            background: linear-gradient(to right, #8e44ad, #7d3c98);
         }
         
         .gallery {
@@ -78,9 +122,16 @@
         }
         
         .card-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             margin-bottom: 10px;
             color: #2c3e50;
+            word-break: break-word;
+        }
+        
+        .file-info {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
         }
         
         .download-btn {
@@ -119,9 +170,10 @@
         
         .loading {
             text-align: center;
-            padding: 20px;
+            padding: 40px;
             font-size: 1.2rem;
             color: #3498db;
+            grid-column: 1 / -1;
         }
         
         .error {
@@ -131,6 +183,17 @@
             color: #c62828;
             border-radius: 10px;
             margin: 20px 0;
+            grid-column: 1 / -1;
+        }
+        
+        .stats {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #2c3e50;
         }
         
         @media (max-width: 768px) {
@@ -141,6 +204,16 @@
             
             h1 {
                 font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .refresh-btn, .upload-btn {
+                width: 80%;
+                justify-content: center;
             }
         }
         
@@ -156,53 +229,151 @@
             h1 {
                 font-size: 1.8rem;
             }
+            
+            .refresh-btn, .upload-btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-images"></i> معرض الصور</h1>
-            <p class="subtitle">مرحبًا بك في معرض الصور. يمكنك عرض الصور وتحميلها إلى هاتفك.</p>
+            <h1><i class="fas fa-images"></i> معرض الصور التلقائي</h1>
+            <p class="subtitle">يقوم هذا الموقع تلقائيًا باستخراج وعرض جميع الصور الموجودة في نفس المجلد</p>
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i> الصور المعروضة يتم اكتشافها تلقائيًا من نفس مجلد الموقع
+            </div>
+            <div class="controls">
+                <button class="refresh-btn" onclick="loadImagesFromServer()">
+                    <i class="fas fa-sync-alt"></i> تحديث الصور
+                </button>
+                <button class="upload-btn" onclick="showFileUpload()">
+                    <i class="fas fa-cloud-upload-alt"></i> رفع صور جديدة (محاكاة)
+                </button>
+            </div>
         </header>
+        
+        <div class="stats" id="statsContainer">
+            جاري البحث عن الصور...
+        </div>
         
         <div id="imageGallery" class="gallery">
             <!-- سيتم إضافة الصور هنا ديناميكيًا -->
             <div class="loading">
-                <i class="fas fa-spinner fa-spin"></i> جارِ تحميل الصور...
+                <i class="fas fa-spinner fa-spin"></i> جاري البحث عن الصور في المجلد...
             </div>
         </div>
         
         <div class="footer">
-            <p>جميع الصور محفوظة &copy; <span id="currentYear"></span> | تم التطوير باستخدام HTML و JavaScript</p>
+            <p>معرض الصور التلقائي &copy; <span id="currentYear"></span> | الصور مستخرجة تلقائيًا من مجلد الموقع</p>
         </div>
     </div>
 
     <script>
-        // قائمة بأسماء الصور في مجلد المشروع
-        // يمكنك تعديل هذه القائمة لتشمل أسماء ملفات الصور الفعلية لديك
-        const imageFiles = [
-            { name: "image1.jpg", title: "منظر طبيعي خلاب" },
-            { name: "image2.jpg", title: "شروق الشمس" },
-            { name: "image3.jpg", title: "غروب الشمس على البحر" },
-            { name: "image4.jpg", title: "الجبال الشاهقة" },
-            { name: "image5.jpg", title: "الغابة الخضراء" },
-            { name: "image6.jpg", title: "زهور الربيع" }
-        ];
-        
         // سنة حقوق النشر
         document.getElementById('currentYear').textContent = new Date().getFullYear();
         
         // العنصر الذي سيحتوي على المعرض
         const galleryElement = document.getElementById('imageGallery');
+        const statsContainer = document.getElementById('statsContainer');
+        
+        // امتدادات الصور المدعومة
+        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
+        
+        // دالة لاستخراج أسماء الصور من الخادم
+        async function fetchImageList() {
+            try {
+                // في بيئة GitHub Pages أو خادم حقيقي، نحتاج لملف JSON يحتوي على قائمة الملفات
+                // ولكن بما أننا في نفس المجلد، سنحاول الحصول على قائمة الملفات بطرق مختلفة
+                
+                // الطريقة 1: محاولة جلب قائمة الملفات من الخادم (إذا كان يدعم directory listing)
+                const response = await fetch('./');
+                if (!response.ok) {
+                    throw new Error('لا يمكن الوصول إلى قائمة الملفات');
+                }
+                
+                const html = await response.text();
+                
+                // تحليل HTML للحصول على روابط الملفات
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // استخراج جميع الروابط من الصفحة
+                const links = Array.from(doc.querySelectorAll('a'));
+                
+                // تصفية الروابط للحصول على الصور فقط
+                const imageFiles = links
+                    .map(link => link.getAttribute('href'))
+                    .filter(href => {
+                        if (!href) return false;
+                        
+                        // التأكد من أن الرابط لا يشير إلى مجلد
+                        if (href.endsWith('/')) return false;
+                        
+                        // التحقق من أن الملف صورة
+                        const lowerHref = href.toLowerCase();
+                        return imageExtensions.some(ext => lowerHref.endsWith(ext));
+                    })
+                    .map(href => ({
+                        name: href,
+                        title: href.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ")
+                    }));
+                
+                return imageFiles;
+                
+            } catch (error) {
+                console.error('خطأ في جلب قائمة الصور:', error);
+                
+                // الطريقة 2: إذا فشلت الطريقة الأولى، نستخدم قائمة افتراضية من الصور
+                // يمكنك إضافة أسماء الصور الفعلية لديك هنا
+                const fallbackImages = [
+                    { name: "IMG_4419.jpeg", title: "صورة 4419" },
+                    { name: "nature.jpg", title: "صورة طبيعة" },
+                    { name: "sunset.png", title: "غروب الشمس" },
+                    { name: "mountain.jpeg", title: "الجبال" }
+                ];
+                
+                // فلترة الصور الافتراضية لتشمل فقط تلك الموجودة فعليًا
+                const existingImages = [];
+                
+                // سنفحص كل صورة افتراضية لمعرفة ما إذا كانت موجودة
+                for (const img of fallbackImages) {
+                    if (await checkImageExists(img.name)) {
+                        existingImages.push(img);
+                    }
+                }
+                
+                return existingImages;
+            }
+        }
+        
+        // دالة للتحقق من وجود صورة
+        function checkImageExists(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
         
         // دالة لإنشاء بطاقة صورة
         function createImageCard(imageName, imageTitle, index) {
+            // استخراج معلومات الملف
+            const fileExt = imageName.split('.').pop().toUpperCase();
+            const fileSize = "N/A"; // في الواقع، نحتاج لطلب من الخادم للحصول على حجم الملف
+            
             return `
                 <div class="card">
-                    <img src="${imageName}" alt="${imageTitle}" id="img-${index}" onerror="this.src='https://via.placeholder.com/300x250/3498db/ffffff?text=صورة+غير+متوفرة'">
+                    <img src="${imageName}" alt="${imageTitle}" id="img-${index}" 
+                         onerror="this.src='https://via.placeholder.com/300x250/3498db/ffffff?text=لا+يمكن+تحميل+الصورة'">
                     <div class="card-content">
                         <h3 class="card-title">${imageTitle}</h3>
+                        <div class="file-info">
+                            <i class="far fa-file-image"></i> ${fileExt} 
+                            | <i class="far fa-hdd"></i> ${fileSize}
+                        </div>
                         <button class="download-btn" onclick="downloadImage('${imageName}', '${imageTitle}')">
                             <i class="fas fa-download"></i> تحميل الصورة
                         </button>
@@ -216,7 +387,7 @@
             // إنشاء رابط تحميل
             const link = document.createElement('a');
             link.href = imageUrl;
-            link.download = imageTitle + '.jpg';
+            link.download = imageTitle.replace(/\s+/g, '_') + '.' + imageUrl.split('.').pop();
             
             // محاكاة النقر على الرابط لبدء التحميل
             document.body.appendChild(link);
@@ -224,77 +395,112 @@
             document.body.removeChild(link);
             
             // إشعار للمستخدم
-            alert(`سيبدأ تحميل الصورة "${imageTitle}" إلى جهازك.`);
+            alert(`جاري تحميل الصورة "${imageTitle}" إلى جهازك.`);
             
-            // تسجيل الحدث (يمكن إزالته في الإصدار النهائي)
-            console.log(`تحميل الصورة: ${imageTitle}`);
+            // تسجيل الحدث
+            console.log(`تحميل الصورة: ${imageTitle} (${imageUrl})`);
         }
         
-        // دالة لفحص وجود الصور
-        function checkImageExists(url, callback) {
-            const img = new Image();
-            img.onload = function() {
-                callback(true);
-            };
-            img.onerror = function() {
-                callback(false);
-            };
-            img.src = url;
-        }
-        
-        // دالة لتحميل المعرض
-        function loadGallery() {
-            // مسح محتوى المعرض الحالي
-            galleryElement.innerHTML = '';
+        // دالة لتحميل وعرض جميع الصور
+        async function loadImagesFromServer() {
+            // عرض حالة التحميل
+            galleryElement.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> جاري البحث عن الصور في المجلد...
+                </div>
+            `;
             
-            // إذا لم توجد صور، عرض رسالة
-            if (imageFiles.length === 0) {
-                galleryElement.innerHTML = `
-                    <div class="error" style="grid-column: 1 / -1;">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <h3>لا توجد صور لعرضها</h3>
-                        <p>يرجى إضافة صور إلى مجلد المشروع وتحديث قائمة imageFiles في الكود.</p>
-                    </div>
+            statsContainer.innerHTML = `<i class="fas fa-search"></i> جاري البحث عن الصور...`;
+            
+            try {
+                // الحصول على قائمة الصور من الخادم
+                const imageFiles = await fetchImageList();
+                
+                // تحديث الإحصائيات
+                statsContainer.innerHTML = `
+                    <i class="fas fa-images"></i> تم العثور على ${imageFiles.length} صورة في المجلد
                 `;
-                return;
-            }
-            
-            // تحميل كل صورة
-            let imagesLoaded = 0;
-            let galleryHTML = '';
-            
-            imageFiles.forEach((image, index) => {
-                // التحقق من وجود الصورة
-                checkImageExists(image.name, function(exists) {
-                    imagesLoaded++;
+                
+                // إذا لم توجد صور، عرض رسالة
+                if (imageFiles.length === 0) {
+                    galleryElement.innerHTML = `
+                        <div class="error" style="grid-column: 1 / -1;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>لا توجد صور في المجلد</h3>
+                            <p>يرجى إضافة صور (مثل IMG_4419.jpeg) إلى نفس مجلد الموقع ثم تحديث الصفحة.</p>
+                            <p style="margin-top: 10px; font-size: 0.9rem;">
+                                <strong>الامتدادات المدعومة:</strong> ${imageExtensions.join(', ')}
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // عرض الصور الموجودة
+                let galleryHTML = '';
+                let imagesChecked = 0;
+                
+                // فحص كل صورة للتأكد من وجودها قبل عرضها
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const image = imageFiles[i];
+                    
+                    // التحقق من وجود الصورة
+                    const exists = await checkImageExists(image.name);
                     
                     if (exists) {
                         // إذا كانت الصورة موجودة، أضفها إلى المعرض
-                        const cardHTML = createImageCard(image.name, image.title, index);
-                        galleryHTML += cardHTML;
+                        galleryHTML += createImageCard(image.name, image.title, i);
                     } else {
-                        // إذا لم توجد الصورة، استخدم صورة بديلة
-                        const cardHTML = createImageCard('https://via.placeholder.com/300x250/e0e0e0/757575?text=صورة+غير+متوفرة', image.title + ' (غير متوفرة)', index);
-                        galleryHTML += cardHTML;
+                        // إذا لم توجد الصورة، قم بتسجيل ذلك
+                        console.log(`الصورة غير موجودة: ${image.name}`);
                     }
                     
-                    // إذا تم تحميل جميع الصور، عرضها
-                    if (imagesLoaded === imageFiles.length) {
-                        galleryElement.innerHTML = galleryHTML;
+                    imagesChecked++;
+                    
+                    // تحديث شريط التقدم
+                    if (imagesChecked === imageFiles.length) {
+                        // إذا تم فحص جميع الصور، عرض المعرض
+                        if (galleryHTML === '') {
+                            galleryElement.innerHTML = `
+                                <div class="error" style="grid-column: 1 / -1;">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <h3>لا يمكن تحميل أي صورة</h3>
+                                    <p>تم العثور على ${imageFiles.length} اسم ملف، لكن لا يمكن الوصول إلى أي منها.</p>
+                                    <p>قد تكون الصور في مجلد فرعي أو تحتاج إلى أذونات مختلفة.</p>
+                                </div>
+                            `;
+                        } else {
+                            galleryElement.innerHTML = galleryHTML;
+                        }
                     }
-                });
-            });
+                }
+                
+            } catch (error) {
+                console.error('خطأ في تحميل الصور:', error);
+                
+                galleryElement.innerHTML = `
+                    <div class="error" style="grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>حدث خطأ أثناء تحميل الصور</h3>
+                        <p>${error.message}</p>
+                        <p>قد تحتاج إلى وضع الموقع على خادم يدعم سرد الملفات.</p>
+                    </div>
+                `;
+                
+                statsContainer.innerHTML = `<i class="fas fa-times-circle"></i> خطأ في تحميل الصور`;
+            }
         }
         
-        // تحميل المعرض عند بدء تشغيل الصفحة
-        document.addEventListener('DOMContentLoaded', loadGallery);
+        // دالة لمحاكاة رفع الصور (لأغراض العرض فقط)
+        function showFileUpload() {
+            alert('في بيئة GitHub فعلية، يمكنك رفع الصور مباشرة إلى المستودع.\n\nلإضافة صور جديدة:\n1. ارفع صورك إلى مجلد المشروع على GitHub\n2. اضغط على زر "تحديث الصور"');
+        }
         
-        // إضافة إمكانية سحب وإفلات الصور (ميزة إضافية)
-        document.addEventListener('dragstart', function(e) {
-            if (e.target.tagName === 'IMG') {
-                e.dataTransfer.setData('text/plain', e.target.src);
-            }
-        });
+        // تحميل الصور عند بدء تشغيل الصفحة
+        document.addEventListener('DOMContentLoaded', loadImagesFromServer);
+        
+        // تحديث تلقائي كل 30 ثانية (اختياري)
+        // setInterval(loadImagesFromServer, 30000);
     </script>
 </body>
 </html>
