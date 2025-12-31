@@ -3,587 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الكفالات المتطور</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>موقع عرض الصور</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #27ae60;
-        }
-
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            font-family: 'Tahoma', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
             padding: 20px;
+            min-height: 100vh;
         }
-
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-
-        .header {
+        
+        header {
             text-align: center;
-            padding: 2rem;
-            background: var(--primary-color);
-            color: white;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-
-        .controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
         }
-
-        .search-box {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            min-width: 250px;
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
         }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .btn-success {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .customer-cards {
+        
+        .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+            gap: 25px;
+            margin-bottom: 40px;
         }
-
-        .customer-card {
+        
+        .card {
             background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease;
-            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
-        .customer-card:hover {
-            transform: translateY(-5px);
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
-
-        .card-header {
-            border-bottom: 2px solid #eee;
-            padding-bottom: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .customer-id {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 0.5rem;
-        }
-
-        .status-indicator {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .status-registered { background: #95a5a6; }
-        .status-arrived { background: #f1c40f; }
-        .status-completed { background: #2ecc71; }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        
+        .card img {
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
+            height: 250px;
+            object-fit: cover;
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
         }
-
-        .form-input {
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .download-btn {
+            display: block;
             width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        .days-counter {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--secondary-color);
+            padding: 12px;
+            background: linear-gradient(to right, #3498db, #2980b9);
             color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            margin-top: 10px;
         }
-
-        .customer-card {
-    border: 2px solid #ccc;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    transition: background 0.3s, border-color 0.3s;
-}
-
-.customer-card.received {
-    background-color: #d4edda; /* لون أخضر فاتح */
-    border-color: #28a745; /* أخضر غامق */
-}
-
-@media print {
-    body {
-        width: 80mm;
-        height: 40mm;
-        margin: 0;
-        padding: 0;
-    }
-}
-
+        
+        .download-btn:hover {
+            background: linear-gradient(to right, #2980b9, #1f639e);
+        }
+        
+        .download-btn i {
+            margin-left: 8px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: #3498db;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 20px;
+            background: #ffebee;
+            color: #c62828;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1>نظام إدارة كفالات الهواتف الذكية</h1>
-            <p>إصدار 2.0 - نظام متكامل لإدارة عمليات الصيانة</p>
+        <header>
+            <h1><i class="fas fa-images"></i> معرض الصور</h1>
+            <p class="subtitle">مرحبًا بك في معرض الصور. يمكنك عرض الصور وتحميلها إلى هاتفك.</p>
         </header>
-
-        <div class="controls">
-            <input type="text" class="search-box" placeholder="ابحث بالاسم أو رقم الهاتف أو ID...">
-            <button class="btn btn-primary" onclick="openRegistration()">
-                <i class="fas fa-plus"></i>
-                تسجيل جديد
-            </button>
-            <button class="btn btn-success" onclick="exportToExcel()">
-                <i class="fas fa-file-excel"></i>
-                تصدير للإكسل
-            </button>
+        
+        <div id="imageGallery" class="gallery">
+            <!-- سيتم إضافة الصور هنا ديناميكيًا -->
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> جارِ تحميل الصور...
+            </div>
         </div>
-
-        <div class="customer-cards" id="customerCards">
-            <!-- سيتم إضافة بطاقات العملاء هنا ديناميكيًا -->
-        </div>
-    </div>
-
-    <!-- نموذج التسجيل (Modal) -->
-    <div id="registrationModal" class="modal">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 1.5rem;">تسجيل كفالة جديدة</h2>
-            <form id="registrationForm">
-                <div class="form-group">
-                    <label class="form-label">اسم العميل</label>
-                    <input type="text" class="form-input" id="customerName" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">نوع الجهاز</label>
-                    <input type="text" class="form-input" id="deviceType" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">وصف المشكلة</label>
-                    <textarea class="form-input" id="problemDescription" rows="3" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">رقم الهاتف</label>
-                    <input type="tel" class="form-input" id="customerPhone" required>
-                </div>
-                
-                <!-- حقل إدخال رقم IMEI -->
-                <div class="form-group">
-                    <label class="form-label">رقم IMEI</label>
-                    <input type="text" class="form-input" id="imeiNumber" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">الشركة الموردة</label>
-                    <select class="form-input" id="supplierCompany">
-                        <option value="iCell">iCell</option>
-                        <option value="Drive">Drive</option>
-                        <option value="Telelink">Telelink</option>
-                        <option value="CELL AVENUE">CELL AVENUE</option>
-                        <option value="MORE TECH">MORE TECH</option>
-                        <option value=" ">أخرى</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
-                        <i class="fas fa-save"></i>
-                        حفظ التسجيل
-                    </button>
-                </div>
-            </form>
+        
+        <div class="footer">
+            <p>جميع الصور محفوظة &copy; <span id="currentYear"></span> | تم التطوير باستخدام HTML و JavaScript</p>
         </div>
     </div>
 
     <script>
-        // توليد معرف فريد
-        function generateID() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
-        }
-    
-        // دالة لتسجيل الحركات والعمليات في localStorage
-        function logTransaction(action, details) {
-            let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-            transactions.push({
-                timestamp: new Date().toLocaleString('ar-EG'),
-                action: action,
-                details: details
-            });
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-            console.log("تم تسجيل الحركة:", action, details);
-        }
-    
-        // فتح نافذة التسجيل
-        function openRegistration() {
-            document.getElementById('registrationModal').style.display = 'flex';
-        }
-    
-        // إغلاق النافذة عند النقر خارج محتوى النافذة
-        window.onclick = function(event) {
-            if (event.target.className === 'modal') {
-                event.target.style.display = 'none';
-            }
-        }
-    
-        // دالة لحفظ بيانات العميل في localStorage
-        function saveCustomer(customerData) {
-            let customers = JSON.parse(localStorage.getItem('customers')) || [];
-            customers.push(customerData);
-            localStorage.setItem('customers', JSON.stringify(customers));
-            console.log("تم حفظ بيانات العميل:", customerData);
-            logTransaction("تسجيل عميل جديد", customerData);
-        }
-    
-       // دالة لطباعة بيانات التسجيل باستخدام طابعة حرارية (محاكاة)
-function printRegistration(customerData) {
-    const printWindow = window.open('', '', 'width=280,height=160');
-
-    printWindow.document.write('<html><head><title>طباعة التسجيل</title>');
-    printWindow.document.write('<style>');
-    printWindow.document.write(`
-        body { 
-            font-family: Arial, sans-serif; 
-            font-size: 11px; 
-            width: 80mm; 
-            height: 40mm;
-            margin: 0; 
-            padding: 2mm;
-            font-weight: bold; /* جعل كل النصوص عريضة */
-        }
-        .header { 
-            text-align: left; /* تم تغيير النص ليصبح على اليسار */
-            margin-bottom: 2mm; 
-            font-size: 20px;
-        }
-        .data { 
-            margin-bottom: 2mm; 
-            line-height: 1.5; 
-        }
-        .label {
-            font-weight: bold;
-        }
-        hr {
-            border: 0;
-            border-top: 1px dashed #000;
-            margin: 2px 0;
-        }
-    `);
-    printWindow.document.write('</style>');
-    printWindow.document.write('</head><body>');
-
-    printWindow.document.write('<div class="header">شحادة سنتر</div>');
-
-    function formatDateTime(dateStr) {
-        const date = new Date(dateStr);
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        let hours = date.getHours();
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        const ampm = hours >= 12 ? 'م' : 'ص';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // الساعة 0 تصبح 12
-        return `${day}/${month}/${year}  ${hours}:${minutes}${ampm}`;
-    }
-
-    function printField(label, value) {
-        printWindow.document.write('<div class="data">' + label + ':' + value + '</div>');
-        printWindow.document.write('<hr>');
-    }
-
-    printField("name", customerData.name);
-    printField("IMEI", customerData.imei);
-    printField("model", customerData.device);
-    printField("problem", customerData.problem);
-    printField("phone", customerData.phone);
-    printField("company", customerData.company);
-    printField("DATE ", formatDateTime(customerData.registrationDate));
-
-    printWindow.document.write('</body></html>');
-
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-
-    logTransaction("طباعة التسجيل", customerData);
-}
-
-    
-        // حفظ بيانات التسجيل عند تقديم النموذج
-        document.getElementById('registrationForm').onsubmit = function(e) {
-            e.preventDefault();
-            
-            const customerData = {
-                id: generateID(),
-                name: document.getElementById('customerName').value,
-                device: document.getElementById('deviceType').value,
-                problem: document.getElementById('problemDescription').value,
-                phone: document.getElementById('customerPhone').value,
-                imei: document.getElementById('imeiNumber').value,  // تم إضافة رقم IMEI
-                company: document.getElementById('supplierCompany').value,
-                status: 'تم التسجيل',
-                registrationDate: new Date().toISOString(), // يضمن تنسيقاً صالحاً
-                daysCounter: 0
-            };
-    
-            saveCustomer(customerData);
-            createCustomerCard(customerData);
-            document.getElementById('registrationModal').style.display = 'none';
-            this.reset();
-            
-            // طباعة بيانات التسجيل باستخدام المحاكاة للطابعة الحرارية 80 مم
-            printRegistration(customerData);
-        }
-    
-        // إنشاء بطاقة العميل وإضافة معرّف العميل كخاصية بيانات لتسهيل التحديث لاحقاً
-        function createCustomerCard(data) {
-    // التأكد من أن البطاقة غير مكررة
-    if (document.querySelector(`.customer-card[data-customer-id="${data.id}"]`)) {
-        return;
-    }
-
-    const card = document.createElement('div');
-    card.className = 'customer-card';
-    card.setAttribute('data-customer-id', data.id); // إضافة معرف العميل
-    card.innerHTML = `
-        <div class="status-indicator status-${getStatusClass(data.status)}"></div>
-        <div class="days-counter">${data.daysCounter} يوم</div>
-        <div class="card-header">
-            <div class="customer-id">ID: ${data.id}</div>
-            <h3>${data.name}</h3>
-            <p>${data.phone}</p>
-        </div>
-        <div class="card-body">
-            <p><strong>نوع الجهاز:</strong> ${data.device}</p>
-            <p><strong>IMEI:</strong> ${data.imei}</p>
-            <p><strong>المشكلة:</strong> ${data.problem}</p>
-            <p><strong>الشركة:</strong> ${data.company}</p>
-            <p><strong>تاريخ التسجيل:</strong> ${data.registrationDate}</p>
-            <select class="status-select" onchange="updateStatus('${data.id}', this.value)">
-                <option value="تم التسجيل" ${data.status === 'تم التسجيل' ? 'selected' : ''}>تم التسجيل</option>
-                <option value="تم الوصول" ${data.status === 'تم الوصول' ? 'selected' : ''}>تم الوصول</option>
-                <option value="تم الإستلام" ${data.status === 'تم الإستلام' ? 'selected' : ''}>تم الإستلام</option>
-            </select>
-        </div>
-    `;
-
-    document.getElementById('customerCards').prepend(card);
-
-    // تحديث لون البطاقة إذا كانت حالتها "تم الوصول"
-    if (data.status === 'تم الوصول') {
-        card.classList.add('received');
-    }
-                // تحديث عداد الأيام بعد إنشاء البطاقة
-                updateDayCounters();
-
-}
-
-    
-    
-        // تحديث حالة العميل
-        function updateStatus(customerId, newStatus) {
-        let customers = JSON.parse(localStorage.getItem('customers')) || [];
-        let customerIndex = customers.findIndex(c => c.id === customerId);
+        // قائمة بأسماء الصور في مجلد المشروع
+        // يمكنك تعديل هذه القائمة لتشمل أسماء ملفات الصور الفعلية لديك
+        const imageFiles = [
+            { name: "image1.jpg", title: "منظر طبيعي خلاب" },
+            { name: "image2.jpg", title: "شروق الشمس" },
+            { name: "image3.jpg", title: "غروب الشمس على البحر" },
+            { name: "image4.jpg", title: "الجبال الشاهقة" },
+            { name: "image5.jpg", title: "الغابة الخضراء" },
+            { name: "image6.jpg", title: "زهور الربيع" }
+        ];
         
-        if (customerIndex === -1) return;
-
-        if (newStatus === 'تم الإستلام') {
-            logTransaction("حذف العميل", { customerId, reason: "تم الإستلام" });
-            customers = customers.filter(c => c.id !== customerId);
-            localStorage.setItem('customers', JSON.stringify(customers));
-
-            // إزالة البطاقة من الصفحة
-            const card = document.querySelector(`.customer-card[data-customer-id="${customerId}"]`);
-            if (card) card.remove();
-            return;
+        // سنة حقوق النشر
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        // العنصر الذي سيحتوي على المعرض
+        const galleryElement = document.getElementById('imageGallery');
+        
+        // دالة لإنشاء بطاقة صورة
+        function createImageCard(imageName, imageTitle, index) {
+            return `
+                <div class="card">
+                    <img src="${imageName}" alt="${imageTitle}" id="img-${index}" onerror="this.src='https://via.placeholder.com/300x250/3498db/ffffff?text=صورة+غير+متوفرة'">
+                    <div class="card-content">
+                        <h3 class="card-title">${imageTitle}</h3>
+                        <button class="download-btn" onclick="downloadImage('${imageName}', '${imageTitle}')">
+                            <i class="fas fa-download"></i> تحميل الصورة
+                        </button>
+                    </div>
+                </div>
+            `;
         }
-
-        // تحديث الحالة في localStorage
-        customers[customerIndex].status = newStatus;
-        localStorage.setItem('customers', JSON.stringify(customers));
-        logTransaction("تحديث الحالة", { customerId, newStatus });
-
-        // تحديث لون البطاقة في الصفحة
-        const card = document.querySelector(`.customer-card[data-customer-id="${customerId}"]`);
-        if (card) {
-            if (newStatus === 'تم الوصول') {
-                card.classList.add('received');
-            } else {
-                card.classList.remove('received');
+        
+        // دالة لتحميل الصور إلى الهاتف
+        function downloadImage(imageUrl, imageTitle) {
+            // إنشاء رابط تحميل
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = imageTitle + '.jpg';
+            
+            // محاكاة النقر على الرابط لبدء التحميل
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // إشعار للمستخدم
+            alert(`سيبدأ تحميل الصورة "${imageTitle}" إلى جهازك.`);
+            
+            // تسجيل الحدث (يمكن إزالته في الإصدار النهائي)
+            console.log(`تحميل الصورة: ${imageTitle}`);
+        }
+        
+        // دالة لفحص وجود الصور
+        function checkImageExists(url, callback) {
+            const img = new Image();
+            img.onload = function() {
+                callback(true);
+            };
+            img.onerror = function() {
+                callback(false);
+            };
+            img.src = url;
+        }
+        
+        // دالة لتحميل المعرض
+        function loadGallery() {
+            // مسح محتوى المعرض الحالي
+            galleryElement.innerHTML = '';
+            
+            // إذا لم توجد صور، عرض رسالة
+            if (imageFiles.length === 0) {
+                galleryElement.innerHTML = `
+                    <div class="error" style="grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>لا توجد صور لعرضها</h3>
+                        <p>يرجى إضافة صور إلى مجلد المشروع وتحديث قائمة imageFiles في الكود.</p>
+                    </div>
+                `;
+                return;
             }
-        }
-
-// إرسال SMS عند تغيير الحالة إلى "تم الوصول"
-if (newStatus === 'تم الوصول') {
-    const customer = customers[customerIndex];
-    const message = `مرحبًا ${customer.name}،\nتم وصول جهازك من الضمان، يمكنك استلامه في أي وقت.\n\n📱 الجهاز: ${customer.device}\n🔢 IMEI: ${customer.imei}\n⚠️ المشكلة: ${customer.problem}\n📌 رقم الطلب: ${customerId}`;
-
-    sendSMS(customer.phone, message);
-}
-
-        }
-    
-
-    // عند تحميل الصفحة، تأكد من تلوين البطاقات التي حالتها "تم الوصول"
-    window.addEventListener('DOMContentLoaded', function() {
-    let customers = JSON.parse(localStorage.getItem('customers')) || [];
-
-    customers.forEach(customer => {
-        if (!document.querySelector(`.customer-card[data-customer-id="${customer.id}"]`)) {
-            createCustomerCard(customer);
-        }
-
-        // تحديث لون البطاقة إذا كانت حالتها "تم الوصول"
-        const card = document.querySelector(`.customer-card[data-customer-id="${customer.id}"]`);
-        if (card && customer.status === 'تم الوصول') {
-            card.classList.add('received');
-        }
-    });
-
-    // تحديث عداد الأيام عند تحميل الصفحة
-    updateDayCounters();
-});
-
-    
-        // دالة لإرسال رسالة SMS وتسجيل العملية في التخزين المحلي
-        function sendSMS(phone, message) {
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`sms:${phone}?body=${encodedMessage}`, '_blank');
-            logTransaction("إرسال رسالة SMS", { phone, message });
-            console.log("تم إرسال رسالة SMS إلى", phone);
-        }
-    
-// تحديث عداد الأيام في كل بطاقة بناءً على تاريخ التسجيل
-function updateDayCounters() {
-    let customers = JSON.parse(localStorage.getItem('customers')) || [];
-    const today = new Date(); // تاريخ اليوم
-
-    document.querySelectorAll('.customer-card').forEach(card => {
-        const customerId = card.getAttribute('data-customer-id');
-        let customer = customers.find(c => c.id === customerId);
-
-        if (customer && customer.registrationDate) {
-            let registrationDate = new Date(customer.registrationDate);
-
-            // التحقق من صحة التاريخ
-            if (isNaN(registrationDate.getTime())) {
-                console.warn(`⚠️ تاريخ تسجيل غير صالح للعميل ${customerId}:`, customer.registrationDate);
-                return; // لا تقم بتحديث العداد
-            }
-
-            // حساب عدد الأيام منذ التسجيل
-            const daysPassed = Math.floor((today - registrationDate) / (1000 * 60 * 60 * 24));
-            let daysElement = card.querySelector('.days-counter');
-            daysElement.textContent = `${daysPassed} يوم`;
-
-            // تحديث القيمة في localStorage
-            customer.daysCounter = daysPassed;
-        }
-    });
-
-    localStorage.setItem('customers', JSON.stringify(customers));
-}
-
-    
-        // تصدير البيانات إلى ملف إكسل (تنفيذ افتراضي)
-        function exportToExcel() {
-            alert('سيتم تنفيذ عملية التصدير للإكسل هنا');
-            logTransaction("تصدير البيانات", { message: "تم تنفيذ تصدير البيانات إلى إكسل" });
-        }
-    
-        // دالة مساعدة للحصول على الكلاس المناسب للحالة
-        function getStatusClass(status) {
-            return status.replace(/ /g, '-').toLowerCase();
-        }
-    
-        // عند تحميل الصفحة يتم استرجاع بيانات العملاء من localStorage وإنشاء البطاقات
-        window.addEventListener('DOMContentLoaded', function() {
-            let customers = JSON.parse(localStorage.getItem('customers')) || [];
-            customers.forEach(customer => {
-                createCustomerCard(customer);
+            
+            // تحميل كل صورة
+            let imagesLoaded = 0;
+            let galleryHTML = '';
+            
+            imageFiles.forEach((image, index) => {
+                // التحقق من وجود الصورة
+                checkImageExists(image.name, function(exists) {
+                    imagesLoaded++;
+                    
+                    if (exists) {
+                        // إذا كانت الصورة موجودة، أضفها إلى المعرض
+                        const cardHTML = createImageCard(image.name, image.title, index);
+                        galleryHTML += cardHTML;
+                    } else {
+                        // إذا لم توجد الصورة، استخدم صورة بديلة
+                        const cardHTML = createImageCard('https://via.placeholder.com/300x250/e0e0e0/757575?text=صورة+غير+متوفرة', image.title + ' (غير متوفرة)', index);
+                        galleryHTML += cardHTML;
+                    }
+                    
+                    // إذا تم تحميل جميع الصور، عرضها
+                    if (imagesLoaded === imageFiles.length) {
+                        galleryElement.innerHTML = galleryHTML;
+                    }
+                });
             });
+        }
+        
+        // تحميل المعرض عند بدء تشغيل الصفحة
+        document.addEventListener('DOMContentLoaded', loadGallery);
+        
+        // إضافة إمكانية سحب وإفلات الصور (ميزة إضافية)
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.dataTransfer.setData('text/plain', e.target.src);
+            }
         });
-    
-        // تحديث عداد الأيام يومياً (محاكاة باستخدام setInterval)
-        setInterval(updateDayCounters, 86400000);
     </script>
-    
 </body>
 </html>
